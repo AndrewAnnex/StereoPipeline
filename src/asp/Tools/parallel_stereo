@@ -515,6 +515,8 @@ def tile_run(prog, args, settings, tile, **kw):
         code = subprocess.call(cmd)
         if code != 0:
             raise Exception('Stereo step ' + kw['msg'] + ' failed')
+        else:
+            print('Stero step ' + kw['msg'] + ' succeeded')
 
     except OSError as e:
         raise Exception('%s: %s' % (binpath, e))
@@ -925,24 +927,26 @@ if __name__ == '__main__':
         try:
 
             # Pick the tile we want from the list of tiles
-            tiles = produce_tiles( settings, opt.job_size_w, opt.job_size_h )
-            tile  = tiles[opt.tile_id]
+            tiles = produce_tiles(settings, opt.job_size_w, opt.job_size_h)
+            num_tiles = len(tiles)
+            tile = tiles[opt.tile_id]
+            counter = f'[{opt.tile_id}/{num_tiles}]'
 
             if ( opt.entry_point == Step.corr ):
                 tile_run('stereo_corr', args, settings, tile,
-                         msg='%d: Correlation' % opt.entry_point)
+                         msg=f'{opt.entry_point} Correlation {counter}')
 
             if ( opt.entry_point == Step.blend ):
                 tile_run('stereo_blend', args, settings, tile,
-                         msg='%d: Blending' % opt.entry_point)
+                         msg=f'{opt.entry_point} Blending {counter}')
 
             if ( opt.entry_point == Step.rfne ):
                 tile_run('stereo_rfne', args, settings, tile,
-                         msg='%d: Refinement' % opt.entry_point)
+                         msg=f'{opt.entry_point} Refinement {counter}')
 
             if ( opt.entry_point == Step.tri ):
                 tile_run('stereo_tri', args, settings, tile,
-                         msg='%d: Triangulation' % opt.entry_point)
+                         msg=f'{opt.entry_point} Triangulation {counter}')
 
         except Exception as e:
             die(e)
